@@ -1,6 +1,10 @@
 # Build output
 *.ipk
 
+# Real broker secrets sent between the user and the broker maintainer for
+# review/editing - contains a live client_id/client_secret, never commit
+config-php.txt
+
 # Real broker config (BROKER_BASE_URL/APP_NAME) — see
 # app/com.preciouscoders.pre.auctionmatepro/enyo/lib/ebay/eBayApiConfig.js.example
 app/com.preciouscoders.pre.auctionmatepro/enyo/lib/ebay/eBayApiConfig.js

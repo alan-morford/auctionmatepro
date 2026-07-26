@@ -321,10 +321,14 @@ if(_115>0){
 _11c+="<BidList><IncludeNotes>true</IncludeNotes><Pagination><EntriesPerPage>"+_115+"</EntriesPerPage><PageNumber>"+_114+"</PageNumber></Pagination></BidList>";
 }
 if(_117>0){
-_11c+="<WonList><IncludeNotes>true</IncludeNotes><Pagination><EntriesPerPage>"+_117+"</EntriesPerPage><PageNumber>"+_116+"</PageNumber></Pagination></WonList>";
+// DurationInDays: 60 is the max eBay allows for WonList/LostList (there is
+// no way to get a full year via this API - a hard eBay platform limit, not
+// a config we can raise) - without it, eBay defaults to a much shorter
+// window and these lists appear empty for anything not very recent.
+_11c+="<WonList><DurationInDays>60</DurationInDays><IncludeNotes>true</IncludeNotes><Pagination><EntriesPerPage>"+_117+"</EntriesPerPage><PageNumber>"+_116+"</PageNumber></Pagination></WonList>";
 }
 if(_119>0){
-_11c+="<LostList><IncludeNotes>true</IncludeNotes><Pagination><EntriesPerPage>"+_119+"</EntriesPerPage><PageNumber>"+_118+"</PageNumber></Pagination><Sort>EndTimeDescending</Sort></LostList>";
+_11c+="<LostList><DurationInDays>60</DurationInDays><IncludeNotes>true</IncludeNotes><Pagination><EntriesPerPage>"+_119+"</EntriesPerPage><PageNumber>"+_118+"</PageNumber></Pagination><Sort>EndTimeDescending</Sort></LostList>";
 }
 if(_11a>0){
 _11c+="<BestOfferList><IncludeNotes>true</IncludeNotes><Pagination><EntriesPerPage>"+_11a+"</EntriesPerPage><PageNumber>"+_11b+"</PageNumber></Pagination></BestOfferList>";
@@ -338,10 +342,11 @@ if(_120>0){
 _125+="<ActiveList><IncludeNotes>true</IncludeNotes><Pagination><EntriesPerPage>"+_120+"</EntriesPerPage><PageNumber>"+_11f+"</PageNumber></Pagination></ActiveList>";
 }
 if(_122>0){
-_125+="<SoldList><IncludeNotes>true</IncludeNotes><Pagination><EntriesPerPage>"+_122+"</EntriesPerPage><PageNumber>"+_121+"</PageNumber></Pagination></SoldList>";
+// Same 60-day eBay platform cap as WonList/LostList above.
+_125+="<SoldList><DurationInDays>60</DurationInDays><IncludeNotes>true</IncludeNotes><Pagination><EntriesPerPage>"+_122+"</EntriesPerPage><PageNumber>"+_121+"</PageNumber></Pagination></SoldList>";
 }
 if(_124>0){
-_125+="<UnsoldList><IncludeNotes>true</IncludeNotes><Pagination><EntriesPerPage>"+_124+"</EntriesPerPage><PageNumber>"+_123+"</PageNumber></Pagination></UnsoldList>";
+_125+="<UnsoldList><DurationInDays>60</DurationInDays><IncludeNotes>true</IncludeNotes><Pagination><EntriesPerPage>"+_124+"</EntriesPerPage><PageNumber>"+_123+"</PageNumber></Pagination></UnsoldList>";
 }
 _125+="</GetMyeBaySellingRequest>";
 return _125;
@@ -1035,7 +1040,14 @@ var _284=Helpers.Locale.getCountry(_283);
 var _285=Helpers.XML.getNodeText("ItemID",item);
 var _286=Helpers.XML.getNodeText("Title",item);
 var _284=Helpers.Locale.getCountry(_283);
-var _287=EBayConfig.SITE_CONFIG[_284].DESC_URL+_285;
+// DESC_URL (vi.ebaydesc.com and friends) is a decommissioned legacy CGI
+// endpoint - confirmed dead via a live request returning a literal HTTP 410
+// Gone with a 4-byte "Gone" body. Parse the real Description node from this
+// same GetItem response instead (already present under DetailLevel=ReturnAll,
+// no extra request field needed) and render it inline; ArticleFacade falls
+// back to detailPageUrl (the real ListingDetails/ViewItemURL, parsed below)
+// if description is ever empty.
+var _287desc=Helpers.XML.getNodeText("Description",item);
 var _288=Helpers.XML.getNodeAsNumber("SellingStatus/BidCount",item);
 var _289=Helpers.XML.getNodeAsNumber("SellingStatus/CurrentPrice",item);
 var _28a=Helpers.XML.getNodeValue("SellingStatus/CurrentPrice/@currencyID",item);
@@ -1207,7 +1219,7 @@ var _2d4=Helpers.XML.getNodeText("ReturnPolicy/ShippingCostPaidBy",item);
 var _2d5=Helpers.XML.getNodeAsNumber("WatchCount",item);
 var _2d6=Helpers.XML.getNodeAsNumber("HitCount",item);
 var _2d7=Helpers.XML.getNodeText("PrivateNotes",item);
-var _2d8={itemId:(_285===false)?undefined:_285,title:(_286===false)?undefined:_286,descriptionUrl:(_287===false)?undefined:_287,bidCount:_288,currency:(_28a===false)?undefined:_28a,price:(_289===false)?undefined:_289,buyItNowPrice:(_28b===false||_28b==0)?undefined:_28b,buyItNowCurrency:(_28c===false)?undefined:_28c,buyItNowAvailable:_2a4,autoPay:_28e,bestOfferCount:_291,bestOfferEnabled:_290,bestOffer:(_292===false||_292==0)?undefined:_292,bestOfferCurrency:(_293===false)?undefined:_293,bestOfferStatus:(_294===false)?undefined:_294,shippingCost:(_295===false)?undefined:_295,shippingCurrency:(_296===false)?undefined:_296,sellerID:(_297===false)?undefined:_297,sellerFeedbackScore:(_298===false)?undefined:_298,sellerPositiveFeedbackPercent:(_29a===false)?undefined:Number(_29a),sellerRatingStar:(_299===false)?undefined:_299,endTime:_29b,maxBid:(_29d===false)?undefined:_29d,maxBidCurrency:(_29e===false)?undefined:_29e,timeLeft:(_2a0===false)?undefined:_2a0,imageUrl:(_2a1===false)?undefined:_2a1,detailPageUrl:(_2a2===false)?undefined:_2a2,highestBidderID:(_2a6===false)?undefined:_2a6,highestBidderFeedbackScore:(_2a7===false)?undefined:_2a7,highestBidderRatingStar:(_2a8===false)?undefined:_2a8,isReserveMet:_2ab,minimumToBid:(_2ac===false)?undefined:_2ac,minimumToBidCurrency:(_2ad===false)?undefined:_2ad,quantitySold:(_2b0===false)?undefined:_2b0,listingType:_2b1,quantity:(_2b2===false)?1:_2b2,quantityAvailable:(_2b3===false)?1:_2b3,location:(_2b4===false)?undefined:_2b4,shipToLocations:(_2b5===false)?undefined:_2b5,insuranceOption:(_2ba===false)?undefined:_2ba,paymentMethods:(_2bb===false)?undefined:_2bb,primaryCategoryName:(_2bf===false)?undefined:_2bf,pictureUrls:_2c0,condition:_2c2,shippingServiceOptions:_2c8,returnPolicyReturnsAccepted:(_2d1===false)?undefined:_2d1,returnPolicyRefund:(_2d2===false)?undefined:_2d2,returnPolicyReturnsWithin:(_2d3===false)?undefined:_2d3,returnPolicyShippingCostPaidBy:(_2d4===false)?undefined:_2d4,watchCount:(_2d5===false)?undefined:_2d5,hitCount:(_2d6===false)?undefined:_2d6,itemSpecifics:_2c3,userNotes:(_2d7===false)?undefined:_2d7,};
+var _2d8={itemId:(_285===false)?undefined:_285,title:(_286===false)?undefined:_286,description:(_287desc===false)?undefined:_287desc,bidCount:_288,currency:(_28a===false)?undefined:_28a,price:(_289===false)?undefined:_289,buyItNowPrice:(_28b===false||_28b==0)?undefined:_28b,buyItNowCurrency:(_28c===false)?undefined:_28c,buyItNowAvailable:_2a4,autoPay:_28e,bestOfferCount:_291,bestOfferEnabled:_290,bestOffer:(_292===false||_292==0)?undefined:_292,bestOfferCurrency:(_293===false)?undefined:_293,bestOfferStatus:(_294===false)?undefined:_294,shippingCost:(_295===false)?undefined:_295,shippingCurrency:(_296===false)?undefined:_296,sellerID:(_297===false)?undefined:_297,sellerFeedbackScore:(_298===false)?undefined:_298,sellerPositiveFeedbackPercent:(_29a===false)?undefined:Number(_29a),sellerRatingStar:(_299===false)?undefined:_299,endTime:_29b,maxBid:(_29d===false)?undefined:_29d,maxBidCurrency:(_29e===false)?undefined:_29e,timeLeft:(_2a0===false)?undefined:_2a0,imageUrl:(_2a1===false)?undefined:_2a1,detailPageUrl:(_2a2===false)?undefined:_2a2,highestBidderID:(_2a6===false)?undefined:_2a6,highestBidderFeedbackScore:(_2a7===false)?undefined:_2a7,highestBidderRatingStar:(_2a8===false)?undefined:_2a8,isReserveMet:_2ab,minimumToBid:(_2ac===false)?undefined:_2ac,minimumToBidCurrency:(_2ad===false)?undefined:_2ad,quantitySold:(_2b0===false)?undefined:_2b0,listingType:_2b1,quantity:(_2b2===false)?1:_2b2,quantityAvailable:(_2b3===false)?1:_2b3,location:(_2b4===false)?undefined:_2b4,shipToLocations:(_2b5===false)?undefined:_2b5,insuranceOption:(_2ba===false)?undefined:_2ba,paymentMethods:(_2bb===false)?undefined:_2bb,primaryCategoryName:(_2bf===false)?undefined:_2bf,pictureUrls:_2c0,condition:_2c2,shippingServiceOptions:_2c8,returnPolicyReturnsAccepted:(_2d1===false)?undefined:_2d1,returnPolicyRefund:(_2d2===false)?undefined:_2d2,returnPolicyReturnsWithin:(_2d3===false)?undefined:_2d3,returnPolicyShippingCostPaidBy:(_2d4===false)?undefined:_2d4,watchCount:(_2d5===false)?undefined:_2d5,hitCount:(_2d6===false)?undefined:_2d6,itemSpecifics:_2c3,userNotes:(_2d7===false)?undefined:_2d7,};
 return _2d8;
 };
 EBayTradingLib._parseTransaction=function(_2d9,item,_2da){

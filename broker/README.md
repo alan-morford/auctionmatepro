@@ -66,3 +66,35 @@ real refresh call once eBay dev keys exist, in case that's wrong in practice.
 3. Use the resulting RuName string (looks like
    `Stefan_Henze-StefanHe-5ddd-4-umjsbs`, per the old app's existing config) as
    `authorize_extra.redirect_uri` in `apps/ebay/config.php`.
+
+## 4. `apps/ebay/deletion-notification.php` — Marketplace Account Deletion compliance endpoint
+
+**Why:** eBay marks every Production keyset "Non Compliant" — and withholds the App ID/Cert
+ID — until it has an HTTPS endpoint registered for Marketplace Account Deletion/Closure
+notifications (eBay's GDPR/CCPA-style requirement — unrelated to the old, dead Client Alerts
+system). This broker doesn't store any eBay user data server-side, so there's nothing to delete;
+the endpoint only needs to pass eBay's verification handshake and ack real notifications so the
+keyset stays compliant.
+
+**Lives at `apps/ebay/deletion-notification.php`**, confirmed live and returning `200`. (An
+earlier session briefly suspected oauth.wosa.link's nginx blanket-blocked everything under
+`apps/*/`, based on a 404 right after the file was renamed there — that theory turned out to be
+wrong; the 404 was just a deployment-timing gap. `apps/ebay/` serves PHP fine; only
+`apps/*/config.php` specifically is blocked, same as the repo's own `.htaccess` documents.)
+
+**What it does:** unlike `config.php`, this file holds no secret itself — no
+copy-to-a-gitignored-file step needed, safe to commit as-is. It reads
+`deletion_verification_token` out of `apps/ebay/config.php` — same git-ignored file that already
+holds `client_id`/`client_secret` — rather than hardcoding the token as a constant in the endpoint
+script, consistent with how every other secret in this broker is handled (this was a real bug in
+the first version: the token was a hardcoded `const`, which would've leaked into git history the
+moment someone pasted a real value in). `ENDPOINT_URL` stays a plain constant in the file — not a
+secret, just needs to match wherever the file is actually served, since eBay's hash is computed
+over that literal string. Handles eBay's `GET ?challenge_code=` verification handshake (returns a
+SHA-256 hash per eBay's spec) and acks `POST` deletion notifications with a `200` after logging
+them.
+
+**Dev portal fields** (Alerts & Notifications tab):
+- Marketplace account deletion notification endpoint: `https://oauth.wosa.link/apps/ebay/deletion-notification.php`
+- Verification token: same value as `deletion_verification_token` in `apps/ebay/config.php`
+- Email to notify if endpoint is down: the user's own email

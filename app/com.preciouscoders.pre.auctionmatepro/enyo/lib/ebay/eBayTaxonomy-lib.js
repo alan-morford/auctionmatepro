@@ -56,6 +56,13 @@ categories.push({categoryId:node.categoryId,categoryName:node.categoryName});
 return{categories:categories};
 };
 EBayTaxonomyLib._ajaxRequest=function(locale,url,onSuccess,onFailure){
+if(!enyo.application.preferences.data.user.access_token){
+// Called unconditionally at every launch via EBayData.init(), including
+// before login — skip the call rather than send "Bearer undefined" and
+// get a 401 from eBay every time.
+onFailure({errorCode:EBayConstants.ErrorCodes.REQUEST_ERROR,errorCodeNumerical:"ETX-NOTOKEN"});
+return;
+}
 if(enyo.application.appdata.connectionInformation.isInternetConnectionAvailable){
 try{
 var params={method:"get",requestHeaders:["Authorization","Bearer "+enyo.application.preferences.data.user.access_token],onSuccess:this._handleEbayResponse.bind(this,onSuccess,onFailure),onFailure:this._handleEbayResponse.bind(this,onSuccess,onFailure)};

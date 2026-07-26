@@ -294,7 +294,14 @@ return Formatters.formatDateLastUpdate(this.article.lastUpdate);
 return "--";
 }
 },getDescriptionUrl:function(){
-return this.article.descriptionUrl;
+// WebView only supports setUrl(), not raw HTML content, so the seller's
+// description HTML is loaded via a data: URI. Falls back to detailPageUrl
+// (the real, live eBay item page) if a listing has no description text -
+// there's no dead-URL fallback like the old DESC_URL pattern used to be.
+if(this.article.description){
+return "data:text/html;charset=utf-8,"+encodeURIComponent(this.article.description);
+}
+return this.article.detailPageUrl||"about:blank";
 },getLocation:function(){
 if(this.article.location){
 return this.article.location;

@@ -28,13 +28,27 @@ return array(
     'authorize_url' => 'https://auth.ebay.com/oauth2/authorize',
     'token_url'     => 'https://api.ebay.com/identity/v1/oauth2/token',
 
+    // eBay's token endpoint requires client_id/client_secret via HTTP Basic auth,
+    // not as body params (the RFC 6749 default this broker otherwise uses) - without
+    // this, token exchange fails with "invalid_client". See lib/OAuth2.php.
+    'token_auth_basic' => true,
+
     // Base scope covers the Trading-API-over-OAuth bridge (traditional APIs don't scope-check
-    // the token at all) and the Browse API. buy.order is needed for Order API checkout.
-    'scope' => 'https://api.ebay.com/oauth/api_scope '
-             . 'https://api.ebay.com/oauth/api_scope/buy.order',
+    // the token at all) and the Browse API — both are all this app needs. Do NOT add
+    // buy.order: Buy-It-Now goes through Trading API's PlaceOffer(action:"Purchase"), not the
+    // Order API, and buy.order requires separate eBay approval most keysets don't have —
+    // requesting it caused a real "invalid_scope" failure at eBay's consent screen.
+    'scope' => 'https://api.ebay.com/oauth/api_scope',
 
     'authorize_extra' => array(
         // The RuName from step 2 above — NOT a literal URL.
         'redirect_uri' => 'YOUR_RUNAME',
     ),
+
+    // Shared secret for the Marketplace Account Deletion notification
+    // endpoint (apps/ebay/deletion-notification.php) — must match the
+    // "Verification token" field entered for this keyset in the eBay dev
+    // portal's Alerts & Notifications tab. Unrelated to OAuth; kept here
+    // rather than hardcoded in the endpoint script so it's never committed.
+    'deletion_verification_token' => 'YOUR_VERIFICATION_TOKEN',
 );
