@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<!--
+  Copyright (C) 2010-2011 Preciouscoders UG (haftungsbeschränkt). All rights reserved.
+
+  @version $Id: index.html 1039 2011-06-12 16:54:30Z stefan $
+  @author Stefan Henze
+  @author Sierk Schmittner
+-->
+
+<html>
+<head>
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="viewport" content="width=device-width initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<title>AuctionMate</title>
+	<script src="/usr/palm/frameworks/enyo/1.0/framework/enyo.js" type="text/javascript"></script>
+</head>
+<body>
+<script type="text/javascript">
+	enyo.application.runInBrowser = false;
+	(function () {
+		var launcher = enyo.application.launcher = new amhd.Launcher();
+		enyo.applicationRelaunchHandler = function (params) {
+			enyo.application.launcher.relaunch(params);
+		};
+		launcher.startup();
+	})();
+</script>
+</body>
+</html>

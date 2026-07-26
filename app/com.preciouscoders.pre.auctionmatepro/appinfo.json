@@ -1,0 +1,76 @@
+{
+	"id": "com.preciouscoders.pre.auctionmatepro",
+	"version": "2.0.5",
+	"vendor": "Preciouscoders UG (haftungsbeschraenkt)",
+	"type": "web",
+	"uiRevision": 2,
+	"noWindow": "true",
+	"main": "enyo.html",
+	"title": "AuctionMate Pro for eBay",
+	"icon": "images/icon64.png",
+	"smallicon": "images/icon32.png",
+	"largeaccounticon": "images/icon48.png",
+	"splashicon": "images/icon256.png",
+	"vendorurl": "http://www.preciouscoders.com",
+	"licenseurl": "http://www.preciouscoders.com/redir/auctionmate/auctionmate-eula-en.html",
+	"copyright": "(C)opyright 2010-2011 Preciouscoders UG (haftungsbeschraenkt)",
+	"support": {
+		"email": {
+			"address": "auctionmatepro@preciouscoders.com",
+			"subject": "AuctionMate Pro for eBay App Support"
+		},
+		"resources": [
+			{
+				"type": "web",
+				"label": "App Website",
+				"url": "http://www.preciouscoders.com/redir/auctionmate/auctionmate-pro-app-en.html"
+			},
+			{
+				"type": "web",
+				"label": "FAQ",
+				"url": "http://www.preciouscoders.com/redir/auctionmate/auctionmate-pro-faq-en.html"
+			},
+			{
+				"type": "web",
+				"label": "Changelog",
+				"url": "http://www.preciouscoders.com/redir/auctionmate/auctionmate-pro-changelog-en.html"
+			},
+			{
+				"type": "web",
+				"label": "License Agreement",
+				"url": "http://www.preciouscoders.com/redir/auctionmate/auctionmate-eula-en.html"
+			}
+		]
+	},
+	"supporthd": {
+		"email": {
+			"address": "auctionmatepro@preciouscoders.com",
+			"subject": "AuctionMate Pro for eBay (TouchPad) App Support"
+		},
+		"resources": [
+			{
+				"type": "web",
+				"label": "App Website",
+				"url": "http://www.preciouscoders.com/redir/auctionmate/auctionmatetp-pro-app-en.html"
+			},
+			{
+				"type": "web",
+				"label": "License Agreement",
+				"url": "http://www.preciouscoders.com/redir/auctionmate/auctionmate-eula-en.html"
+			}
+		]
+	},
+	"checkUpdateUrl": "http://apps.preciouscoders.com/pre/auctionmate/update.release.2.0.5.#{lang}.json",
+	"checkUpdateUrlEnyo": "http://apps.preciouscoders.com/pre/auctionmate/enyo.update.release.2.0.5.#{lang}.json",
+	"expireDate": "",
+	"eulaUrl": "http://www.preciouscoders.com/redir/auctionmate/auctionmate-eula-en.html",
+	"proPromotionUrl": "http://www.preciouscoders.com/redir/auctionmate/auctionmate-propromotion-#{lang}.html",
+	"universalSearch": {
+		"search": { 
+			"displayName": "AuctionMate eBay Search",
+			"url": "com.preciouscoders.pre.auctionmatepro",
+			"launchParam": {"search": true, "searchterm": "#{searchTerms}"}
+		}
+	},
+	"logLevel": 0
+}

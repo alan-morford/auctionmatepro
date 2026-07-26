@@ -1,0 +1,785 @@
+/**
+ * Copyright (C) 2010-2011 Preciouscoders UG (haftungsbeschränkt). All rights reserved.
+ * 
+ * @version $Id: amhd.css 1218 2011-09-13 16:30:32Z stefan $
+ * @author Stefan Henze
+ * @author Sierk Schmittner
+ */
+
+/*************************************************************
+ * THEME OVERRIDES
+ ***/
+.enyo-held {
+	background: transparent url(../images/held.png) left top no-repeat;
+	-webkit-background-size: 100% 100%;
+}
+.enyo-toolbar {
+	min-height: 56px;
+}
+
+.common-radiogroup {
+	position: relative;
+	top: 2px;
+}
+.common-radiogroup .enyo-tabbutton {
+	width: auto !important;
+	border-width: 0 12px;
+	min-width: 70px;
+}
+.common-radiogroup .enyo-button-icon-text {
+	margin: 6px 0 -6px 0;
+	font-size: 11px;
+	color: #fff;
+	/*text-shadow: 0 0 5px #000;*/
+}
+.common-radiogroup .enyo-tabbutton.enyo-first, 
+.common-radiogroup .enyo-tabbutton.enyo-middle, 
+.common-radiogroup .enyo-tabbutton.enyo-last, 
+.common-radiogroup .enyo-tabbutton.enyo-single {
+	-webkit-border-image: url(../images/radiobutton.png) 0 12 48 12;
+}
+.common-radiogroup .enyo-tabbutton.enyo-first.enyo-button-depressed,
+.common-radiogroup .enyo-tabbutton.enyo-first.enyo-button-down,
+.common-radiogroup .enyo-tabbutton.enyo-middle.enyo-button-depressed,
+.common-radiogroup .enyo-tabbutton.enyo-middle.enyo-button-down,
+.common-radiogroup .enyo-tabbutton.enyo-last.enyo-button-depressed,
+.common-radiogroup .enyo-tabbutton.enyo-last.enyo-button-down,
+.common-radiogroup .enyo-tabbutton.enyo-single.enyo-button-depressed,
+.common-radiogroup .enyo-tabbutton.enyo-single.enyo-button-down {
+	-webkit-border-image: url(../images/radiobutton.png) 48 12 0 12;
+}
+
+/*************************************************************
+ * COMMON
+ ***/
+.common-anchor {
+	position: relative;
+}
+.common-list-activeitem {
+	background: transparent url(../images/highlight-bg.png) left top no-repeat;
+	-webkit-background-size: 100% 100%;
+}
+
+.common-bottomline {
+	border-bottom: 1px solid #9d9d99;
+}
+.common-topline {
+	border-top: 1px solid #9d9d99;
+}
+.common-columnrightborder {
+	border-right: 1px solid #9d9d99;
+}
+.common-hidden {
+	visibility: hidden;
+}
+.common-spinnercontainer {
+	height: 0;
+}
+.common-spinner {
+	margin-top: 70px;
+}
+.common-lightscrim {
+	background: #fff;
+	opacity: 0.6;
+}
+.common-scrim {
+	background: #000;
+	opacity: 0.65;
+}
+.common-partialscrim {
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	left: 0px;
+	bottom: 0px;
+}
+.common-scrimhigh {
+	z-index: 101;
+}
+.common-color-textlight {
+	color: #666;
+}
+.common-headercentered {
+	text-align: center;
+}
+.common-headerbutton {
+	position: absolute;
+	top: 6px;
+}
+
+.common-textcolor-green {
+	color: green;
+}
+
+.common-nocontenttext {
+	font-size: 16px;
+	padding-top: 8px;
+}
+
+/*************************************************************
+ * CHROME
+ ***/
+.header-shadow,
+.main-header-shadow,
+.footer-shadow,
+.right-shadow {
+	position: absolute; 
+	z-index: 100;
+	pointer-events: none;
+}
+
+.header-shadow {
+	margin-bottom:-3px;
+	height: 3px;
+	width: 100%;
+	background:transparent url('../images/headershadow.png') bottom repeat-x;
+}
+
+.main-header-shadow {
+	top: 0;
+	height: 62px;
+	width: 100%;
+	background:transparent url('../images/mainheadershadow.png') bottom repeat-x;
+}
+.footer-shadow {
+	bottom: 0;
+	height: 59px; 
+	width: 100%;
+	background:transparent url('../images/footershadow.png') top repeat-x;
+}
+.right-shadow {
+	height: 100%;
+	width: 3px;
+	background:transparent url('../images/rightshadow.png') left repeat-y;
+}
+
+/*************************************************************
+ * MAIN
+ ***/
+.main-header {
+	min-height: 0;
+	height: 58px;
+	background: transparent url(../images/header.png) left top no-repeat;
+}
+.main-header .enyo-header-inner {
+	padding-top: 4px;
+	padding-bottom: 4px;
+	min-height: 0;
+}
+.main-username {
+	margin-left: 20px;
+	overflow: hidden;
+}
+.main-username-label {
+	font-size: 12px;
+	color: #666;
+	padding-right: 6px;
+}
+.main-username-name {
+	font-size: 14px;
+}
+
+.main-tab-count { /* was dashboard-newitem */
+	position: absolute;
+	right: -3px;
+	top: -3px;
+	line-height: 24px;
+	font-weight: bold;
+	height: 28px;
+	-webkit-border-image: url(images/dashboard-newitem-badge.png) 0 12 28 12 repeat stretch;
+	-webkit-box-sizing: border-box;
+	border-width: 0px 12px 0px 12px;
+}
+.main-tab-count-label {
+	margin: 0 -4px;
+	font-size: 16px;
+	color: #FFF;
+}
+
+
+/*************************************************************
+ * KEYVALUEPAIR
+ ***/
+
+.keyvaluepair-float .keyvaluepair-left {
+	display: inline;
+	margin-right: 6px;
+}
+.keyvaluepair-float .keyvaluepair-right {
+	display: inline;
+}
+.keyvaluepair-stacked .keyvaluepair-left {
+	margin-right: 6px;
+}
+.keyvaluepair-stacked .keyvaluepair-right {
+}
+.keyvaluepair-float {
+	
+}
+.keyvaluepair-stacked {
+	
+}
+
+/*************************************************************
+ * ARTICLE
+ ***/
+.article-main {
+	min-width: 370px;
+}
+.article-empty {
+	background-color: #fff;
+}
+.article-emptyimage {
+	height: 200px;
+	width: 200px;
+	/*opacity: 0.4;*/
+}
+
+.article-spinnercontainer {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(255, 255, 255, 0.6);
+}
+
+.article-userArticleStatus {
+	min-height: 0;
+}
+.article-userArticleStatus .enyo-header-inner {
+	padding-top: 4px;
+	padding-bottom: 4px;
+	-webkit-box-pack: center !important;
+	min-height: 0;
+	font-size: 16px;
+}
+.article-userArticleStatus-high {
+	background: transparent url(../images/highlight-bg.png) left top no-repeat;
+	-webkit-background-size: 100% 100%;
+}
+
+.article-detailsdescriptionswitch {
+	border-bottom: 1px solid #9d9d99;
+}
+.article-detailsdescriptionswitch>div {
+	width: 300px;
+	margin: 10px 0 5px 0;
+}
+.article-textarea {
+	padding: 4px 8px;
+}
+
+.article-titlearea {
+	padding: 4px 8px 8px 8px;
+}
+
+.article-background {
+	background-color: #fff;
+}
+.article-backbox-group {
+	padding: 1px 0;
+}
+.article-backbox {
+	background-color: #dedede;
+	padding: 6px;
+	margin: 6px 6px 8px 18px;
+}
+
+.article-smalltext, .article-smalltext-light, .article-smalltext-red {
+	font-size: 16px;
+	padding: 4px 10px 4px 0;
+}
+.article-smalltext-light {
+	color: #666;
+}
+.article-smalltext-red {
+	color: #FF0000;
+}
+
+.article-largetext {
+	font-size: 24px;
+	line-height: 26px;
+	padding: 4px 0 4px 0;
+}
+.article-largetext small {
+	font-size: 16px;
+	line-height: normal;
+}
+
+.article-bidbuybutton {
+	min-width: 80px;
+}
+
+.article-imagescroller {
+	padding: 0;
+	height: 148px;
+	white-space: nowrap;
+}
+
+.article-imagescroller-image {
+	height: 130px;
+	margin: 8px 4px;
+}
+.article-imagescroller-image:first-child {
+	margin-left: 12px;
+}
+.article-imagescroller-image:last-child {
+	margin-right: 12px;
+}
+
+.article-lastupdate {
+	font-size: 12px;
+	color: #ddd;
+}
+
+.article-descriptionspinner {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+}
+
+/*************************************************************
+ * ARTICLELIST
+ ***/
+.articlelist-headericon {
+	margin: -9px 10px -14px 0;
+	height: 48px;
+}
+.articlelist-lastupdate {
+	font-size: 12px;
+	padding-top: 7px;
+}
+.articlelist-emptylisttext {
+	font-size: 16px;
+	padding-bottom: 95px;
+}
+
+/*************************************************************
+ * ARTICLELISTITEM
+ ***/
+.articlelistitem-title {
+	font-size: 16px;
+	line-height: 18px;
+	max-height: 36px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.articlelistitem-price {
+	font-size: 16px;
+	line-height: 18px;
+	font-weight: bold;
+}
+.articlelistitem-price-green {
+	color: green;
+	font-size: 16px;
+	line-height: 18px;
+	font-weight: bold;
+}
+.articlelistitem-price-red {
+	color: red;
+	font-size: 16px;
+	line-height: 18px;
+	font-weight: bold;
+}
+.articlelistitem-buyitnow {
+	font-size: 16px;
+	line-height: 18px;
+	font-weight: bold;
+}
+.articlelistitem-shippingcost {
+	font-size: 12px;
+}
+.articlelistitem-flags {
+	font-size: 12px;
+}
+.articlelistitem-reserveNotMet {
+	color: red;
+	font-size: 12px;
+}
+.articlelistitem-timeleft {
+	font-size: 12px;
+}
+
+.articlelistitem-imagebox {
+	margin: -3px 8px -2px -4px;
+	border: 1px solid #9D9D99;
+	height: 68px;
+	width: 68px;
+	background-color: white;
+	padding: 1px 0 0 0;
+}
+.articlelistitem-imagebox-noimage {
+	background: white url(../images/noimage.png) no-repeat;
+	-webkit-background-size: 100% 100%;
+}
+.articlelistitem-image {
+	max-height: 64px;
+	max-width: 64px;
+}
+.articlelistitem-middle {
+	margin-right: 8px;
+}
+
+/*************************************************************
+ * MAINLIST
+ ***/
+.mainlist-item {
+	position: relative;
+}
+.mainlist-icon {
+	height: 60px;
+	width: 60px;
+	margin: -5px 10px -10px -15px;
+}
+.mainlist-peek .mainlist-icon {
+	margin-left: -25px;
+}
+.mainlist-numarticles {
+	position: absolute;
+	top: 22px;
+	right: 10px;
+	margin-right: 4px;
+	padding: 4px 0px;
+	border-width: 0px 11px 0px 11px;
+	-webkit-border-image: url(../images/numitems-badge.png) 0 11 0 11;
+	color: white;
+	font-size: 16px;
+	font-weight: bold;
+}
+.mainlist-peek .mainlist-numarticles {
+	right: 178px;
+}
+.mainlist-peek .mainlist-listname {
+	display: none;
+}
+
+/*************************************************************
+ * IMAGEVIEWER
+ ***/
+.imageviewer-background {
+	background-color: #333333;
+}
+.imageviewer-controls {
+	padding: 5px;
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+
+/*************************************************************
+ * SELLERINFO
+ ***/
+.sellerinfo-leftcolumn {
+	width: 350px;
+}
+.sellerinfo-sellericon {
+	margin-bottom: -9px;
+}
+.sellerinfo-sellerrating {
+	font-size: 16px;
+}
+.sellerinfo-table {
+	font-size: 16px;
+}
+.sellerinfo-table th {
+	vertical-align: bottom;
+	text-align: left;
+}
+.sellerinfo-table td, .sellerinfo-table th {
+	padding-right: 8px;
+}
+.sellerinfo-table td:last-child, .sellerinfo-table th:last-child {
+	padding-right: 0;
+}
+.sellerinfo-ratingtext {
+	text-align: right !important;
+}
+
+.sellerinfo-rating {
+	white-space: nowrap;
+}
+.sellerinfo-rating-none,
+.sellerinfo-rating-0,
+.sellerinfo-rating-10,
+.sellerinfo-rating-20,
+.sellerinfo-rating-30,
+.sellerinfo-rating-40,
+.sellerinfo-rating-50,
+.sellerinfo-rating-60,
+.sellerinfo-rating-70,
+.sellerinfo-rating-80,
+.sellerinfo-rating-90,
+.sellerinfo-rating-100
+{
+	width: 17px;
+	height: 16px;
+}
+.sellerinfo-rating-0 { background-image: url(../images/sellerinfo/star0.png); }
+.sellerinfo-rating-10 { background-image: url(../images/sellerinfo/star10.png); }
+.sellerinfo-rating-20 { background-image: url(../images/sellerinfo/star20.png); }
+.sellerinfo-rating-30 { background-image: url(../images/sellerinfo/star30.png); }
+.sellerinfo-rating-40 { background-image: url(../images/sellerinfo/star40.png); }
+.sellerinfo-rating-50 { background-image: url(../images/sellerinfo/star50.png); }
+.sellerinfo-rating-60 { background-image: url(../images/sellerinfo/star60.png); }
+.sellerinfo-rating-70 { background-image: url(../images/sellerinfo/star70.png); }
+.sellerinfo-rating-80 { background-image: url(../images/sellerinfo/star80.png); }
+.sellerinfo-rating-90 { background-image: url(../images/sellerinfo/star90.png); }
+.sellerinfo-rating-100 { background-image: url(../images/sellerinfo/star100.png); }
+
+.sellerinfo-comment {
+	padding: 6px 10px;
+}
+.sellerinfo-comment-text {
+	font-size: 16px;
+}
+.sellerinfo-comment-subtext {
+	font-size: 12px;
+}
+.sellerinfo-comment-type {
+	height: 19px;
+	width: 18px;
+}
+.sellerinfo-comment-type-Positive { background-image: url(../images/sellerinfo/positive.png);	}
+.sellerinfo-comment-type-Neutral { background-image: url(../images/sellerinfo/neutral.png);	}
+.sellerinfo-comment-type-Negative { background-image: url(../images/sellerinfo/negative.png);	}
+
+.sellerinfo-comment-listend {
+	text-align: center;
+	font-size: 16px;
+	padding-top: 24px;
+}
+
+/*************************************************************
+ * MESSAGEFOLDER
+ ***/
+.messagefolder-icon {
+	margin-right: 10px;
+}
+.messagefolder-badge {
+	/*position: absolute;
+	top: 22px;
+	right: 10px;*/
+	margin-right: 4px;
+	padding: 4px 0px;
+	border-width: 0px 11px 0px 11px;
+	-webkit-border-image: url(../images/numitems-badge.png) 0 11 0 11;
+	color: white;
+	font-size: 16px;
+	font-weight: bold;
+}
+.messagefolder-totalcount {
+	font-size: 11px;
+}
+
+/*************************************************************
+ * MESSAGELIST
+ ***/
+.messagelist-item-from {
+	font-size: 12px;
+	white-space: nowrap;
+	overflow: hidden;
+	margin-right: 10px;
+	text-overflow: ellipsis;
+}
+.messagelist-item-unread .messagelist-item-from {
+	font-weight: bold;
+}
+.messagelist-item-date {
+	font-size: 12px;
+	white-space: nowrap;
+}
+.messagelist-item-unread .messagelist-item-date {
+	font-weight: bold;
+}
+.messagelist-item-subject {
+	margin-top: 4px;
+	font-size: 16px;
+	line-height: 18px;
+}
+.messagelist-item-unread .messagelist-item-subject {
+	font-weight: bold;
+}
+.messagelist-item-flag {
+	padding-top: 8px;
+}
+
+
+/*************************************************************
+ * MESSAGE
+ ***/
+.message-main {
+	min-width: 370px;
+}
+.message-empty {
+	background-color: #fff;
+}
+.message-emptyimage {
+	height: 200px;
+	width: 200px;
+	/*opacity: 0.4;*/
+}
+
+.message-headeritem {
+	padding-bottom: 4px;
+}
+.message-subject {
+	font-size: 18px;
+}
+.message-from {
+	font-size: 16px;
+	color: #666;
+	white-space: nowrap;
+	overflow: hidden;
+	margin-right: 10px;
+	text-overflow: ellipsis;
+}
+.message-date {
+	font-size: 16px;
+	color: #666;
+	white-space: nowrap;
+}
+.message-articlebutton {
+	margin: 3px 8px 0 8px;
+	min-width: 180px;
+	max-width: 240px;
+}
+
+.message-scroller {
+	background-color: #777;
+}
+.message-text {
+	background-color: #fff;
+	padding: 0 4px;
+}
+
+/*************************************************************
+ * POPUP (common)
+ ***/
+.popup-general {
+	width: 320px;
+}
+.popup-transitioner {
+	-webkit-transform-style: preserve-3d;
+	-webkit-transform: scale(1.4);
+	opacity: 0;
+	-webkit-transition-property: opacity, -webkit-transform;
+	-webkit-transition-duration: 0.2s;
+}
+.popup-scaleFadeIn {
+	-webkit-transform: scale(1);
+	opacity: 1;
+}
+.popup-title {
+	font-size: 20px;
+	padding-bottom: 10px;
+	/*border-bottom: 1px solid #9d9d99;*/
+}
+.popup-text {
+	font-size: 16px;
+}
+.popup-bottomline {
+	margin-bottom: 10px;
+	/*border-bottom: 1px solid #9d9d99;*/
+}
+
+/*************************************************************
+ * PLACEBIDPOPUP
+ ***/
+.placeBidPopup-numberarea {
+	background-color: #aaa;
+	-webkit-border-radius: 5px;
+}
+.placeBidPopup-numberbutton {
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+.placeBidPopup-bid {
+	font-size: 24px;
+	font-weight: bold;
+	text-align: right;
+	padding: 0 12px 4px 0;
+}
+
+/*************************************************************
+ * BUYNOWPOPUP
+ ***/
+.buynowpopup-quantityselector>:first-child {
+	-webkit-box-pack: end !important;
+	padding-right: 20px;
+}
+
+/*************************************************************
+ * PREFERENCES
+ ***/
+.preferences-content {
+	width: 500px;
+	padding: 15px 0;
+}
+.preferences-spacebottom {
+	margin-bottom: 10px;
+}
+.preferences-smalltext {
+	font-size: 16px;
+}
+
+/*************************************************************
+ * CONNECT (brokered OAuth2 login code/URL panel)
+ ***/
+.connect-code-url {
+	font-size: 20px;
+	font-weight: bold;
+	color: #0061d5;
+	padding: 4px 0 16px;
+	word-break: break-all;
+}
+.connect-code-value {
+	font-size: 42px;
+	font-weight: bold;
+	letter-spacing: 6px;
+	padding: 8px 0 16px;
+	font-family: monospace;
+}
+
+/*************************************************************
+ * DIVIDER
+ ***/
+.divider-main {
+	-webkit-box-pack: start;
+	-webkit-box-align: stretch;
+	background: transparent url(../images/highlight-bg.png) left top no-repeat;
+	-webkit-background-size: 100% 100%;
+	padding: 4px 4px 4px 10px;
+}
+.divider-caption {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	text-transform: uppercase;
+	white-space: nowrap;
+	font-weight: bold;
+	font-size: 12pt;
+	color: #333;
+}
+
+/*************************************************************
+ * TEST
+ ***/
+.banner-image {
+	width: 300px;
+	height: 50px;
+}
+
+/*************************************************************
+ * TEST
+ ***/
+.test-openbuttoncontainer {
+	height: 0;
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	z-index: 100000;
+	opacity: 0;
+}
+.test-openbutton {
+	margin: -30px 5px 5px -30px;
+}

@@ -1,0 +1,5 @@
+{
+    "logLevel": "0",
+	"debuggingEnabled": false,
+	"escapeHTMLInTemplates": false
+}

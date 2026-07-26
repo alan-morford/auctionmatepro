@@ -1,0 +1,9 @@
+# Build output
+*.ipk
+
+# Real broker config (BROKER_BASE_URL/APP_NAME) — see
+# app/com.preciouscoders.pre.auctionmatepro/enyo/lib/ebay/eBayApiConfig.js.example
+app/com.preciouscoders.pre.auctionmatepro/enyo/lib/ebay/eBayApiConfig.js
+
+# Third-party SDK, not part of this app
+devkit/

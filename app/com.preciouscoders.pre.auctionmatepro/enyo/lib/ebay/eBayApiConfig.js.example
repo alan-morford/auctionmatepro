@@ -1,0 +1,12 @@
+/**
+ * eBayApiConfig.js — broker configuration.
+ *
+ * Copy this file to eBayApiConfig.js (build.sh does this automatically if
+ * it's missing). Points at the shared oauth.wosa.link broker's "ebay" app —
+ * see ../../../../broker/ in the repo root for the broker-side config this
+ * pairs with. No eBay App ID / Cert ID goes here — those live only on the
+ * broker (see broker/apps/ebay/config.example.php).
+ */
+EBayApiConfig={};
+EBayApiConfig.BROKER_BASE_URL="https://oauth.wosa.link";
+EBayApiConfig.APP_NAME="ebay";
