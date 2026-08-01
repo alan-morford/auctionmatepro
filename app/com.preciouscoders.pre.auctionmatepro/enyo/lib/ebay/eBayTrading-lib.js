@@ -225,6 +225,7 @@ var _10e=undefined;
 switch(_10b){
 case "932":
 case "17470":
+case "1001":
 _10e=EBayConstants.ErrorCodes.TOKEN_EXPIRED;
 break;
 case "16110":
@@ -233,6 +234,7 @@ _10e=EBayConstants.ErrorCodes.TOKEN_REVOKED;
 break;
 case "16119":
 case "931":
+case "21916984":
 _10e=EBayConstants.ErrorCodes.TOKEN_INVALID;
 break;
 case "16118":

@@ -83,7 +83,15 @@ if(response.status==200){
 onSuccess(eval("("+response.responseText+")"));
 }else{
 pc.Log.error("status code"+response.status);
-onFailure({errorCode:EBayConstants.ErrorCodes.REQUEST_ERROR,errorCodeNumerical:"ETX-HTTP-"+response.status});
+var errorId=undefined;
+try{
+var json=eval("("+response.responseText+")");
+errorId=json&&json.errors&&json.errors[0]?json.errors[0].errorId:undefined;
+}
+catch(e2){
+}
+var mappedErrorCode=EBayConstants.mapOAuthErrorToErrorCode(response.status,errorId);
+onFailure({errorCode:mappedErrorCode||EBayConstants.ErrorCodes.REQUEST_ERROR,errorCodeNumerical:errorId||("ETX-HTTP-"+response.status)});
 }
 }
 catch(e){

@@ -57,22 +57,34 @@ return $L("This item has not been sold");
 }
 return "";
 },getTimeLeftLabel:function(){
+if(this.article.timeLeft==undefined){
+return "";
+}else{
 if(this.hasTimeLeft()){
 return $L("Time left:");
 }else{
 return $L("Ended:");
 }
+}
 },getTimeLeft:function(){
+if(this.article.timeLeft==undefined){
+return "";
+}else{
 if(this.hasTimeLeft()){
 return Formatters.formatTimeLeft(this.article.timeLeft)+" ("+Formatters.formatDate(this.article.endTime)+")";
 }else{
 return Formatters.formatDate(this.article.endTime);
 }
+}
 },getTimeLeftShort:function(){
+if(this.article.timeLeft==undefined){
+return "";
+}else{
 if(this.hasTimeLeft()){
 return Formatters.formatTimeLeft(this.article.timeLeft);
 }else{
 return $L("ended");
+}
 }
 },hasTimeLeft:function(){
 var _1=this.article.timeLeft;

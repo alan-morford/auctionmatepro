@@ -1,5 +1,5 @@
 EBayData={};
-EBayData.data={user:{userId:undefined,name:undefined,email:undefined,token:undefined,locale:undefined},auctionlists:{watch:{count:undefined,items:[],lastUpdate:undefined,isLoading:true},bid:{count:undefined,items:[],lastUpdate:undefined,isLoading:true},won:{count:undefined,items:[],lastUpdate:undefined,isLoading:true},lost:{count:undefined,items:[],lastUpdate:undefined,isLoading:true},bestOffer:{count:undefined,items:[],lastUpdate:undefined,isLoading:true},active:{count:undefined,items:[],lastUpdate:undefined,isLoading:true},sold:{count:undefined,items:[],lastUpdate:undefined,isLoading:true},unsold:{count:undefined,items:[],lastUpdate:undefined,isLoading:true}},messages:{flaggedMessageCount:undefined,newAlertCount:undefined,newMessageCount:undefined,totalAlertCount:undefined,totalMessageCount:undefined,unresolvedAlertCount:undefined,folders:[],},reminders:{buying:{feedbackToReceiveCount:undefined,feedbackToSendCount:undefined,outbidCount:undefined,paymentToSendCount:undefined},selling:{declinedRTERequestCount:undefined,docsForCCProcessingToSendCount:undefined,feedbackToReceiveCount:undefined,feedbackToSendCount:undefined,itemReceiptConfirmationToReceiveCount:undefined,itemReceiptToConfirmCount:undefined,paymentToReceiveCount:undefined,pendingRTERequestCount:undefined,refundCancelledCount:undefined,refundInitiatedCount:undefined,refundOnHoldCount:undefined,relistingNeededCount:undefined,RTEToProcessCount:undefined,secondChanceOfferCount:undefined,shippingDetailsToBeProvidedCount:undefined,shippingNeededCount:undefined,totalNewLeadsCount:undefined}},searchResult:{searchValue:undefined,searchDescription:undefined,listingType:undefined,category:undefined,minPrice:undefined,minPriceCurrency:undefined,maxPrice:undefined,maxPriceCurrency:undefined,condition:undefined,sortOrder:undefined,count:undefined,items:[],categories:[],lastUpdate:undefined,isLoading:true},sellerList:{userId:undefined,endTimeFrom:undefined,endTimeTo:undefined,count:undefined,items:[],lastUpdate:undefined},commentList:{userId:undefined,count:undefined,comments:[],lastUpdate:undefined},categories:undefined,itemsAwaitingFeedback:{count:undefined,items:[],lastUpdate:undefined,}};
+EBayData.data={user:{userId:undefined,name:undefined,email:undefined,token:undefined,locale:undefined},auctionlists:{watch:{count:undefined,items:[],lastUpdate:undefined,isLoading:true},bid:{count:undefined,items:[],lastUpdate:undefined,isLoading:true},won:{count:undefined,items:[],lastUpdate:undefined,isLoading:true},lost:{count:undefined,items:[],lastUpdate:undefined,isLoading:true},bestOffer:{count:undefined,items:[],lastUpdate:undefined,isLoading:true},active:{count:undefined,items:[],lastUpdate:undefined,isLoading:true},sold:{count:undefined,items:[],lastUpdate:undefined,isLoading:true},unsold:{count:undefined,items:[],lastUpdate:undefined,isLoading:true}},messages:{flaggedMessageCount:undefined,newAlertCount:undefined,newMessageCount:undefined,totalAlertCount:undefined,totalMessageCount:undefined,unresolvedAlertCount:undefined,folders:[],},reminders:{buying:{feedbackToReceiveCount:undefined,feedbackToSendCount:undefined,outbidCount:undefined,paymentToSendCount:undefined},selling:{declinedRTERequestCount:undefined,docsForCCProcessingToSendCount:undefined,feedbackToReceiveCount:undefined,feedbackToSendCount:undefined,itemReceiptConfirmationToReceiveCount:undefined,itemReceiptToConfirmCount:undefined,paymentToReceiveCount:undefined,pendingRTERequestCount:undefined,refundCancelledCount:undefined,refundInitiatedCount:undefined,refundOnHoldCount:undefined,relistingNeededCount:undefined,RTEToProcessCount:undefined,secondChanceOfferCount:undefined,shippingDetailsToBeProvidedCount:undefined,shippingNeededCount:undefined,totalNewLeadsCount:undefined}},searchResult:{searchValue:undefined,filters:{},sortOrder:undefined,count:undefined,items:[],categories:[],aspectRefinements:[],lastUpdate:undefined,isLoading:true},sellerList:{userId:undefined,endTimeFrom:undefined,endTimeTo:undefined,count:undefined,items:[],lastUpdate:undefined},commentList:{userId:undefined,count:undefined,comments:[],lastUpdate:undefined},categories:undefined,itemsAwaitingFeedback:{count:undefined,items:[],lastUpdate:undefined,}};
 EBayData.lists={WATCH:"watch",BID:"bid",WON:"won",LOST:"lost",BEST_OFFER:"bestOffer",ACTIVE:"active",SOLD:"sold",UNSOLD:"unsold"};
 EBayData.searchList="search";
 EBayData.sellerList="seller";
@@ -171,18 +171,12 @@ _1a.isLoading=true;
 EBayData.invalidateSearchResult=function(){
 pc.Log.info("EBayData.invalidateSearchResult called");
 EBayData.data.searchResult.searchValue=undefined;
-EBayData.data.searchResult.searchDescription=undefined;
-EBayData.data.searchResult.listingType=undefined;
-EBayData.data.searchResult.category=undefined;
-EBayData.data.searchResult.minPrice=undefined;
-EBayData.data.searchResult.minPriceCurrency=undefined;
-EBayData.data.searchResult.maxPrice=undefined;
-EBayData.data.searchResult.maxPriceCurrency=undefined;
-EBayData.data.searchResult.condition=undefined;
+EBayData.data.searchResult.filters={};
 EBayData.data.searchResult.sortOrder=undefined;
 EBayData.data.searchResult.count=undefined;
 EBayData.data.searchResult.items=[];
 EBayData.data.searchResult.categories=[];
+EBayData.data.searchResult.aspectRefinements=[];
 EBayData.data.searchResult.lastUpdate=undefined;
 EBayData.data.searchResult.isLoading=true;
 };
@@ -497,41 +491,50 @@ pc.defer(_64.bind(this,_5b,false,_65));
 };
 EBayData.findItems=function(_66,_67,_68,_69,_6a){
 pc.Log.info("EBayData.findItems called[searchValue="+_66+", offset="+_67+", count="+_68+", sortOrder="+_69+"]");
-this._findItemsInternal(_66,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,_67,_68,_69,_6a);
+this.findItemsAdvanced(_66,{},_67,_68,_69,_6a);
 };
-EBayData.findItemsAdvanced=function(_6b,_6c,_6d,_6e,_6f,_70,_71,_72,_73,_74,_75,_76,_77){
-pc.Log.info("EBayData.findItemsAdvanced called[searchValue="+_6b+", searchDescription="+_6c+". listingType="+_6d+", category="+_6e+", minPrice="+_6f+", minPriceCurrency="+_70+", maxPrice="+_71+", maxPriceCurrency="+_72+ +", condition="+_73+", offset="+_74+", count="+_75+", sortOrder="+_76+"]");
-if(_6f==undefined){
-_70=undefined;
+// filters: {listingType, category, minPrice, minPriceCurrency, maxPrice,
+//   maxPriceCurrency, conditions:[], sellers:[], itemLocationCountry,
+//   maxDeliveryCost, freeShippingOnly, returnsAccepted, businessSellerOnly,
+//   aspectFilters} - built by SearchFilterPopup.js and passed straight
+// through to EBayBrowseLib.search (see eBayBrowse-lib.js's _buildFilterParam/
+// _buildAspectFilterParam for how each field maps to eBay's filter=/
+// aspect_filter query syntax). category is pulled back out as its own
+// positional arg for EBayBrowseLib.search below since Browse API's
+// category_ids is a separate query param from filter=, not part of it.
+EBayData.findItemsAdvanced=function(searchValue,filters,offset,count,sortOrder,callback){
+pc.Log.info("EBayData.findItemsAdvanced called[searchValue="+searchValue+", filters="+enyo.json.stringify(filters)+", offset="+offset+", count="+count+", sortOrder="+sortOrder+"]");
+filters=filters||{};
+if(filters.minPrice==undefined){
+filters.minPriceCurrency=undefined;
 }
-if(_71==undefined){
-_72=undefined;
+if(filters.maxPrice==undefined){
+filters.maxPriceCurrency=undefined;
 }
-this._findItemsInternal(_6b,_6c,_6d,_6e,_6f,_70,_71,_72,_73,_74,_75,_76,_77);
+this._findItemsInternal(searchValue,filters,offset,count,sortOrder,callback);
 };
-EBayData._findItemsInternal=function(_78,_79,_7a,_7b,_7c,_7d,_7e,_7f,_80,_81,_82,_83,_84){
+EBayData._findItemsInternal=function(searchValue,filters,offset,count,sortOrder,callback){
 try{
-var _85=true;
-if(this.data.searchResult.searchValue==_78&&this.data.searchResult.searchDescription==_79&&this.data.searchResult.listingType==_7a&&this.data.searchResult.category==_7b&&this.data.searchResult.minPrice==_7c&&this.data.searchResult.minPriceCurrency==_7d&&this.data.searchResult.maxPrice==_7e&&this.data.searchResult.maxPriceCurrency==_7f&&this.data.searchResult.condition==_80&&this.data.searchResult.sortOrder==_83){
-if(this.data.searchResult.items.length==this.data.searchResult.count||this.data.searchResult.items.length>=_81+_82){
-_85=false;
+var needsFetch=true;
+if(this.data.searchResult.searchValue==searchValue&&this.data.searchResult.sortOrder==sortOrder&&enyo.json.stringify(this.data.searchResult.filters||{})==enyo.json.stringify(filters)){
+if(this.data.searchResult.items.length==this.data.searchResult.count||this.data.searchResult.items.length>=offset+count){
+needsFetch=false;
 }
 }
-if(_85){
-var _86=Math.ceil((_81+_82)/50);
-var _87=50;
+if(needsFetch){
+var page=Math.ceil((offset+count)/50);
+var pageSize=50;
 this.data.searchResult.isLoading=true;
-var _searchFilters={listingType:_7a,minPrice:_7c,minPriceCurrency:_7d,maxPrice:_7e,maxPriceCurrency:_7f,condition:_80};
-EBayBrowseLib.search(this.data.user.locale,_78,_7b,_searchFilters,_86,_87,_83,this._handleFindItemsInternal.bind(this,_78,_79,_7a,_7b,_7c,_7d,_7e,_7f,_80,_86,_87,_83,_84));
+EBayBrowseLib.search(this.data.user.locale,searchValue,filters.category,filters,page,pageSize,sortOrder,this._handleFindItemsInternal.bind(this,searchValue,filters,page,pageSize,sortOrder,callback));
 }else{
-var _88={realOffset:0,items:this.data.searchResult.items,categories:this.data.searchResult.categories,count:this.data.searchResult.count};
-pc.defer(_84.bind(this,true,_88));
+var cached={realOffset:0,items:this.data.searchResult.items,categories:this.data.searchResult.categories,count:this.data.searchResult.count};
+pc.defer(callback.bind(this,true,cached));
 }
 }
 catch(e){
 pc.Log.logException(e);
-var _89={errorCode:EBayConstants.ErrorCodes.COMMON_ERROR,errorCodeNumerical:"ED-09"};
-pc.defer(_84.bind(this,false,_89));
+var errorObj={errorCode:EBayConstants.ErrorCodes.COMMON_ERROR,errorCodeNumerical:"ED-09"};
+pc.defer(callback.bind(this,false,errorObj));
 }
 };
 EBayData.getUserProfile=function(_8a,_8b,_8c,_8d){
@@ -1201,27 +1204,21 @@ pc.defer(_143.bind(this,_142,_144,_145));
 EBayData._handleUpdateBidListAfterPlaceOffer=function(_146,_147,_148,_149,_14a,_14b){
 pc.defer(_147.bind(this,_146,_148,_149));
 };
-EBayData._handleFindItemsInternal=function(_14c,_14d,_14e,_14f,_150,_151,_152,_153,_154,_155,_156,_157,_158,_159,_15a){
-if(_159){
-if(_14c!=this.data.searchResult.searchValue||_157!=this.data.searchResult.sortOrder||_14d!=this.data.searchResult.searchDescription||_14e!=this.data.searchResult.listingType||_14f!=this.data.searchResult.category||_150!=this.data.searchResult.minPrice||_151!=this.data.searchResult.minPriceCurrency||_152!=this.data.searchResult.maxPrice||_153!=this.data.searchResult.maxPriceCurrency||_154!=this.data.searchResult.condition){
-this.data.searchResult.searchValue=_14c;
-this.data.searchResult.searchDescription=_14d;
-this.data.searchResult.listingType=_14e;
-this.data.searchResult.category=_14f;
-this.data.searchResult.minPrice=_150;
-this.data.searchResult.minPriceCurrency=_151;
-this.data.searchResult.maxPrice=_152;
-this.data.searchResult.maxPriceCurrency=_153;
-this.data.searchResult.condition=_154;
-this.data.searchResult.sortOrder=_157;
+EBayData._handleFindItemsInternal=function(searchValue,filters,page,pageSize,sortOrder,callback,success,result){
+if(success){
+if(searchValue!=this.data.searchResult.searchValue||sortOrder!=this.data.searchResult.sortOrder||enyo.json.stringify(filters)!=enyo.json.stringify(this.data.searchResult.filters||{})){
+this.data.searchResult.searchValue=searchValue;
+this.data.searchResult.filters=filters;
+this.data.searchResult.sortOrder=sortOrder;
 this.data.searchResult.items=[];
 this.data.searchResult.categories=[];
 }
-if(_15a.items!=undefined){
-this.data.searchResult.count=_15a.count;
-if(_155==1){
-this.data.searchResult.items=_15a.items;
-this.data.searchResult.categories=_15a.categories;
+if(result.items!=undefined){
+this.data.searchResult.count=result.count;
+this.data.searchResult.aspectRefinements=result.aspectRefinements||[];
+if(page==1){
+this.data.searchResult.items=result.items;
+this.data.searchResult.categories=result.categories;
 for(var i=0;i<this.data.searchResult.items.length;i++){
 if(this._isItemInList(this.data.auctionlists.watch.items,this.data.searchResult.items[i])!=undefined){
 this.data.searchResult.items[i].isWatching=true;
@@ -1230,17 +1227,17 @@ this.data.searchResult.items[i].isWatching=false;
 }
 }
 }else{
-var _15b=(_155-1)*_156;
-for(var i=0;i<_15a.items.length;i++){
-this.data.searchResult.items[_15b+i]=_15a.items[i];
-if(this._isItemInList(this.data.auctionlists.watch.items,this.data.searchResult.items[_15b+i])!=undefined){
-this.data.searchResult.items[_15b+i].isWatching=true;
+var offsetIntoItems=(page-1)*pageSize;
+for(var i=0;i<result.items.length;i++){
+this.data.searchResult.items[offsetIntoItems+i]=result.items[i];
+if(this._isItemInList(this.data.auctionlists.watch.items,this.data.searchResult.items[offsetIntoItems+i])!=undefined){
+this.data.searchResult.items[offsetIntoItems+i].isWatching=true;
 }else{
-this.data.searchResult.items[_15b+i].isWatching=false;
+this.data.searchResult.items[offsetIntoItems+i].isWatching=false;
 }
 }
 }
-this.data.searchResult.lastUpdate=_15a.lastUpdate;
+this.data.searchResult.lastUpdate=result.lastUpdate;
 }else{
 this.data.searchResult.count=0;
 this.data.searchResult.items=[];
@@ -1248,10 +1245,10 @@ this.data.searchResult.categories=[];
 this.data.searchResult.lastUpdate=new Date();
 }
 this.data.searchResult.isLoading=false;
-var _15a={realOffset:0,items:this.data.searchResult.items,items:this.data.searchResult.categories,count:this.data.searchResult.count};
-pc.defer(_158.bind(this,true,_15a));
+var returned={realOffset:0,items:this.data.searchResult.items,categories:this.data.searchResult.categories,count:this.data.searchResult.count};
+pc.defer(callback.bind(this,true,returned));
 }else{
-pc.defer(_158.bind(this,false,_15a));
+pc.defer(callback.bind(this,false,result));
 }
 };
 EBayData._handleGetUserProfile=function(_15c,_15d,_15e,_15f,_160){

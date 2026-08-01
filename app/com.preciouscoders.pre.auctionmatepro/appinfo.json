@@ -62,6 +62,7 @@
 	},
 	"checkUpdateUrl": "http://apps.preciouscoders.com/pre/auctionmate/update.release.2.0.5.#{lang}.json",
 	"checkUpdateUrlEnyo": "http://apps.preciouscoders.com/pre/auctionmate/enyo.update.release.2.0.5.#{lang}.json",
+	"appMuseumId": "3038",
 	"expireDate": "",
 	"eulaUrl": "http://www.preciouscoders.com/redir/auctionmate/auctionmate-eula-en.html",
 	"proPromotionUrl": "http://www.preciouscoders.com/redir/auctionmate/auctionmate-propromotion-#{lang}.html",

@@ -31,7 +31,11 @@ EBayBrowseLib={};
 EBayBrowseLib.API_BASE="https://api.ebay.com/buy/browse/v1";
 EBayBrowseLib.search=function(locale,keywords,categoryId,filters,page,pageSize,sortOrder,callback){
 pc.Log.info("EBayBrowseLib.search called[locale="+locale+", keywords="+keywords+", categoryId="+categoryId+", page="+page+", pageSize="+pageSize+"]");
-var url=this.API_BASE+"/item_summary/search?limit="+pageSize+"&offset="+((page-1)*pageSize);
+// ASPECT_REFINEMENTS is requested on every search (not just when the filter
+// popup is open) so the dynamic Model/Platform/etc. rows are already
+// available the moment the user opens the filter popup, without a second
+// round trip - see _handleSearchResponseSuccess's aspectRefinements parsing.
+var url=this.API_BASE+"/item_summary/search?fieldgroups=MATCHING_ITEMS,ASPECT_REFINEMENTS&limit="+pageSize+"&offset="+((page-1)*pageSize);
 if(keywords!=undefined&&keywords!=""){
 url+="&q="+encodeURIComponent(keywords);
 }
@@ -42,6 +46,10 @@ var filterParts=this._buildFilterParam(filters);
 if(filterParts.length>0){
 url+="&filter="+encodeURIComponent(filterParts.join(","));
 }
+var aspectFilterParam=this._buildAspectFilterParam(filters,categoryId);
+if(aspectFilterParam!=undefined){
+url+="&aspect_filter="+encodeURIComponent(aspectFilterParam);
+}
 var sort=this._mapSortOrder(sortOrder);
 if(sort!=undefined){
 url+="&sort="+sort;
@@ -49,10 +57,14 @@ url+="&sort="+sort;
 this._ajaxRequest(locale,url,this._handleSearchResponseSuccess.bind(this,callback),this._handleResponseFailure.bind(this,callback));
 };
 // filters: {listingType, minPrice, minPriceCurrency, maxPrice, maxPriceCurrency,
-//   paymentMethodPayPal, condition, sellers:[], sellerBusinessType} — same
-// shape findItemsAdvanced's caller (advancedSearch) already builds; mapped
-// here to Browse API's filter= aspect syntax instead of Finding's
-// itemFilter(n).name/value pairs.
+//   paymentMethodPayPal, conditions:[], sellers:[], itemLocationCountry,
+//   maxDeliveryCost, freeShippingOnly, returnsAccepted, businessSellerOnly,
+//   aspectFilters:{categoryId, selections:{aspectName:[values]}}} - built by
+// the search filter popup (SearchFilterPopup.js); mapped here to Browse
+// API's filter= aspect syntax instead of Finding's itemFilter(n).name/value
+// pairs. NOTE: field names/bracing below are written from eBay's documented
+// schema, same as the rest of this file - not yet exercised against a live
+// response, verify once real testing starts.
 EBayBrowseLib._buildFilterParam=function(filters){
 var parts=[];
 if(!filters){
@@ -77,20 +89,63 @@ if(filters.minPrice!=undefined||filters.maxPrice!=undefined){
 var lo=filters.minPrice!=undefined?filters.minPrice:"";
 var hi=filters.maxPrice!=undefined?filters.maxPrice:"";
 parts.push("price:["+lo+".."+hi+"]");
-if(filters.minPriceCurrency||filters.maxPriceCurrency){
-parts.push("priceCurrency:"+(filters.minPriceCurrency||filters.maxPriceCurrency));
-}
+// eBay's price filter is documented as needing priceCurrency alongside it
+// to actually be honored - SearchFilterPopup.js has no currency picker (a
+// single-marketplace personal app doesn't need one), so this defaults to
+// USD rather than silently sending a price filter eBay ignores. Confirmed
+// on-device: applying a $100-$110 price filter returned items well outside
+// that range before this default was added.
+parts.push("priceCurrency:"+(filters.minPriceCurrency||filters.maxPriceCurrency||"USD"));
 }
 if(filters.paymentMethodPayPal){
 parts.push("paymentMethods:{PAYPAL}");
 }
-if(filters.condition!=undefined&&filters.condition!=EBayConstants.DEFAULT_ALL){
-parts.push("conditionIds:{"+filters.condition+"}");
+if(filters.conditions!=undefined&&filters.conditions.length>0){
+parts.push("conditionIds:{"+filters.conditions.join("|")+"}");
 }
 if(filters.sellers!=undefined&&filters.sellers.length>0){
 parts.push("sellers:{"+filters.sellers.join("|")+"}");
 }
+if(filters.itemLocationCountry!=undefined&&filters.itemLocationCountry!=EBayConstants.DEFAULT_ALL){
+parts.push("itemLocationCountry:"+filters.itemLocationCountry);
+}
+if(filters.freeShippingOnly){
+parts.push("maxDeliveryCost:0");
+}else{
+if(filters.maxDeliveryCost!=undefined){
+parts.push("maxDeliveryCost:"+filters.maxDeliveryCost);
+}
+}
+if(filters.returnsAccepted){
+parts.push("returnsAccepted:true");
+}
+if(filters.businessSellerOnly){
+parts.push("sellerAccountTypes:{BUSINESS}");
+}
 return parts;
+};
+// aspect_filter is a separate query param from filter= and only reliably
+// scopes to a single category context, so SearchFilterPopup constrains the
+// UI to one dominantCategoryId's worth of aspect selections at a time (see
+// its category-switch handling) - filters.aspectFilters.categoryId is
+// already that single resolved id by the time it gets here.
+EBayBrowseLib._buildAspectFilterParam=function(filters,categoryId){
+if(!filters||!filters.aspectFilters||!filters.aspectFilters.categoryId||!filters.aspectFilters.selections){
+return undefined;
+}
+var resolvedCategoryId=(categoryId!=undefined&&categoryId!=EBayConstants.DEFAULT_ALL)?categoryId:filters.aspectFilters.categoryId;
+var clauses=["categoryId:"+resolvedCategoryId];
+var selections=filters.aspectFilters.selections;
+for(var aspectName in selections){
+var values=selections[aspectName];
+if(values&&values.length>0){
+clauses.push("{"+aspectName+"}:{"+values.join("|")+"}");
+}
+}
+if(clauses.length<=1){
+return undefined;
+}
+return clauses.join(",");
 };
 EBayBrowseLib._mapSortOrder=function(sortOrder){
 if(sortOrder==undefined){
@@ -162,7 +217,8 @@ catch(e2){
 var errorId=json&&json.errors&&json.errors[0]?json.errors[0].errorId:undefined;
 var message=json&&json.errors&&json.errors[0]?json.errors[0].message:undefined;
 pc.Log.error("status code"+response.status+(message?(" "+message):""));
-onFailure({errorCode:EBayConstants.ErrorCodes.REQUEST_ERROR,errorCodeNumerical:errorId||("EBL-HTTP-"+response.status),errorShortMessage:message,errorLongMessage:message});
+var mappedErrorCode=EBayConstants.mapOAuthErrorToErrorCode(response.status,errorId);
+onFailure({errorCode:mappedErrorCode||EBayConstants.ErrorCodes.REQUEST_ERROR,errorCodeNumerical:errorId||("EBL-HTTP-"+response.status),errorShortMessage:message,errorLongMessage:message});
 }
 }
 catch(e){
@@ -180,8 +236,31 @@ for(var i=0;i<json.itemSummaries.length;i++){
 items.push(this._parseItemSummary(json.itemSummaries[i]));
 }
 }
-var result={count:json.total||items.length,items:items,categories:[],lastUpdate:undefined};
+var result={count:json.total||items.length,items:items,categories:[],lastUpdate:undefined,aspectRefinements:this._parseAspectRefinements(json)};
 callback(true,result);
+};
+// The user's own live test on the eBay Android app (searching "NES") showed
+// dynamic, category-dependent facets like "Platform"/"Model" that don't
+// appear at all for an unrelated search ("socks") - this is that same data,
+// via Browse API's fieldgroups=ASPECT_REFINEMENTS. Empty array (not an
+// error) when the search has no aspect data, which SearchFilterPopup takes
+// as "don't render any dynamic rows".
+EBayBrowseLib._parseAspectRefinements=function(json){
+var result=[];
+var distributions=json.refinement&&json.refinement.aspectDistributions;
+if(distributions==undefined){
+return result;
+}
+for(var i=0;i<distributions.length;i++){
+var dist=distributions[i];
+var values=[];
+var valueDistributions=dist.aspectValueDistributions||[];
+for(var j=0;j<valueDistributions.length;j++){
+values.push({value:valueDistributions[j].localizedAspectValue,matchCount:valueDistributions[j].matchCount});
+}
+result.push({aspectName:dist.localizedAspectName,dominantCategoryId:dist.dominantCategoryId,values:values});
+}
+return result;
 };
 EBayBrowseLib._handleGetItemResponseSuccess=function(callback,json){
 callback(true,this._parseItemDetail(json));
@@ -233,7 +312,9 @@ shippingCurrency=item.shippingOptions[0].shippingCost.currency;
 // legacyItemId (e.g. some international/variation listings), so this falls
 // back to the compound id for those - EBayBrowseLib.getItem's own anonymous
 // path already branches on either format.
-return{itemId:item.legacyItemId||item.itemId,title:item.title,imageUrl:item.image?item.image.imageUrl:undefined,bidCount:bidCount,price:price,currency:currency,buyItNowPrice:buyItNowPrice,buyItNowCurrency:buyItNowCurrency,buyItNowAvailable:buyItNowAvailable,shippingCost:shippingCost,shippingCurrency:shippingCurrency,timeLeft:undefined,endTime:item.itemEndDate?Helpers.parseISO8601Date(item.itemEndDate.toString()):undefined,listingType:listingType};
+var endTime=item.itemEndDate?Helpers.parseISO8601Date(item.itemEndDate.toString()):undefined;
+var timeLeft=endTime?Helpers.timeLeftFromEndDate(endTime):undefined;
+return{itemId:item.legacyItemId||item.itemId,title:item.title,imageUrl:item.image?item.image.imageUrl:undefined,bidCount:bidCount,price:price,currency:currency,buyItNowPrice:buyItNowPrice,buyItNowCurrency:buyItNowCurrency,buyItNowAvailable:buyItNowAvailable,shippingCost:shippingCost,shippingCurrency:shippingCurrency,timeLeft:timeLeft,endTime:endTime,listingType:listingType};
 };
 // Target shape matches the old (now removed) EBayShoppingLib._parseItem as
 // closely as Browse API's richer/differently-shaped item detail response

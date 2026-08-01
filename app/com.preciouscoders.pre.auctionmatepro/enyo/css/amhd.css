@@ -710,6 +710,34 @@
 }
 
 /*************************************************************
+ * SEARCH FILTER
+ ***/
+.searchfilter-popup {
+	width: 650px;
+	height: 560px;
+}
+.searchfilter-scroller {
+	width: 100%;
+}
+.searchfilter-checkboxpopup {
+	width: 380px;
+	height: 460px;
+}
+.searchfilter-checkboxlist-scroller {
+	flex: 1;
+	-webkit-box-flex: 1;
+}
+.searchfilter-priceinput {
+	width: 100px;
+}
+.searchfilter-pricetolabel {
+	padding: 0 10px;
+}
+.searchfilter-actions {
+	padding: 10px 15px;
+}
+
+/*************************************************************
  * PREFERENCES
  ***/
 .preferences-content {
@@ -726,12 +754,20 @@
 /*************************************************************
  * CONNECT (brokered OAuth2 login code/URL panel)
  ***/
+.connect-code-box {
+	border: 1px solid #9D9D99;
+	-webkit-border-radius: 6px;
+	padding: 16px 24px;
+	margin-bottom: 16px;
+	background-color: #fff;
+}
 .connect-code-url {
 	font-size: 20px;
 	font-weight: bold;
 	color: #0061d5;
 	padding: 4px 0 16px;
 	word-break: break-all;
+	text-align: center;
 }
 .connect-code-value {
 	font-size: 42px;
@@ -739,6 +775,13 @@
 	letter-spacing: 6px;
 	padding: 8px 0 16px;
 	font-family: monospace;
+	text-align: center;
+}
+.connect-code-row {
+	margin-top: 8px;
+}
+.connect-code-qr {
+	margin-right: 20px;
 }
 
 /*************************************************************

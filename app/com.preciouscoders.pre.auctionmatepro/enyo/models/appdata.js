@@ -1,4 +1,4 @@
-enyo.kind({name:"amhd.AppData",kind:"enyo.Component",ACCEPTURL:"https://signin.ebay.com/ws/eBayISAPI.dll?ThirdPartyAuthSucessFailure&isAuthSuccessful=true",REJECTURL:"https://signin.ebay.com/ws/eBayISAPI.dll?ThirdPartyAuthSucessFailure",LOCALE:"en_US",ErrorCodes:{NO_CONNECTION:"no connection"},lists:[{listName:EBayData.lists.WATCH,listText:$L("Watching"),icon:"watching",category:$L("Buying")},{listName:EBayData.lists.BID,listText:$L("Bidding"),icon:"bidding",category:$L("Buying")},{listName:EBayData.lists.WON,listText:$L("Won"),icon:"won",category:$L("Buying")},{listName:EBayData.lists.LOST,listText:$L("Lost"),icon:"lost",category:$L("Buying")},{listName:EBayData.lists.ACTIVE,listText:$L("Selling"),icon:"selling",category:$L("Selling")},{listName:EBayData.lists.SOLD,listText:$L("Sold"),icon:"sold",category:$L("Selling")},{listName:EBayData.lists.UNSOLD,listText:$L("Not sold"),icon:"unsold",category:$L("Selling")}],searchList:{listName:EBayData.searchList,icon:"searching"},sellerList:{listName:EBayData.sellerList,icon:"seller"},noList:{listName:EBayData.noList,icon:"none"},connectionInformation:{isInternetConnectionAvailable:false,ipAddress:undefined,},deviceId:undefined,components:[{name:"connectionStatusService",kind:"PalmService",service:"palm://com.palm.connectionmanager/",method:"getstatus",subscribe:true,onSuccess:"getStatusSuccess",onFailure:"serviceFailure"},{name:"idService",kind:"PalmService",service:"palm://com.palm.preferences/systemProperties",method:"Get",onSuccess:"idServiceSuccess",onFailure:"idServiceFailure"},{name:"updateInfoService",kind:"WebService",handleAs:"json",onSuccess:"loadUpdateInformationSuccess",onFailure:"loadUpdateInformationFailure"}],updateAndBannerInformation:undefined,_createCallback:null,create:function(_1){
+enyo.kind({name:"amhd.AppData",kind:"enyo.Component",ACCEPTURL:"https://signin.ebay.com/ws/eBayISAPI.dll?ThirdPartyAuthSucessFailure&isAuthSuccessful=true",REJECTURL:"https://signin.ebay.com/ws/eBayISAPI.dll?ThirdPartyAuthSucessFailure",LOCALE:"en_US",ErrorCodes:{NO_CONNECTION:"no connection"},lists:[{listName:EBayData.lists.WATCH,listText:$L("Watching"),icon:"watching",category:$L("Buying")},{listName:EBayData.lists.BID,listText:$L("Bidding"),icon:"bidding",category:$L("Buying")},{listName:EBayData.lists.WON,listText:$L("Won"),icon:"won",category:$L("Buying")},{listName:EBayData.lists.LOST,listText:$L("Lost"),icon:"lost",category:$L("Buying")},{listName:EBayData.lists.ACTIVE,listText:$L("Selling"),icon:"selling",category:$L("Selling")},{listName:EBayData.lists.SOLD,listText:$L("Sold"),icon:"sold",category:$L("Selling")},{listName:EBayData.lists.UNSOLD,listText:$L("Not sold"),icon:"unsold",category:$L("Selling")}],searchList:{listName:EBayData.searchList,icon:"searching"},sellerList:{listName:EBayData.sellerList,icon:"seller"},noList:{listName:EBayData.noList,icon:"none"},connectionInformation:{isInternetConnectionAvailable:false,ipAddress:undefined,},deviceId:undefined,components:[{name:"connectionStatusService",kind:"PalmService",service:"palm://com.palm.connectionmanager/",method:"getstatus",subscribe:true,onSuccess:"getStatusSuccess",onFailure:"serviceFailure"},{name:"idService",kind:"PalmService",service:"palm://com.palm.preferences/systemProperties",method:"Get",onSuccess:"idServiceSuccess",onFailure:"idServiceFailure"},{name:"updateInfoService",kind:"WebService",handleAs:"json",onSuccess:"loadUpdateInformationSuccess",onFailure:"loadUpdateInformationFailure"},{name:"appMuseumVersionService",kind:"WebService",handleAs:"json",onSuccess:"_appMuseumVersionSuccess",onFailure:"_appMuseumVersionFailure"},{name:"appMuseumDetailsService",kind:"WebService",handleAs:"json",onSuccess:"_appMuseumDetailsSuccess",onFailure:"_appMuseumDetailsFailure"}],updateAndBannerInformation:undefined,_updateDismissed:false,_appMuseumUpdateInfo:undefined,_appMuseumCurrentVersion:undefined,_createCallback:null,create:function(_1){
 this.inherited(arguments);
 this._createCallback=_1;
 this.$.connectionStatusService.call();
@@ -47,6 +47,85 @@ this.updateAndBannerInformation=_d;
 this.raiseAppEvent("UpdateInformation",null);
 },loadUpdateInformationFailure:function(_e,_f){
 this.log("loadUpdateInformationFailure called");
+},
+// App Museum II update check (see update.MD in the repo root for the
+// original blueprint, ported from com.emu7800.touchpad's native
+// updater.c/updater.h to this app's Enyo/WebService equivalent). Separate
+// from loadUpdateInformation above - that's the original 2011 company's
+// own (long-dead) banner-promo service that Banner.js still depends on,
+// this is the new App-Museum-hosted "a newer version exists, want to
+// install it" check. appMuseumId (this app's numeric museum listing id,
+// 3038) lives in appinfo.json alongside the legacy checkUpdateUrl fields,
+// not hardcoded here, matching that existing config-in-appinfo.json
+// convention.
+checkForAppMuseumUpdate:function(){
+var _appInfo=enyo.fetchAppInfo();
+var _museumId=_appInfo.appMuseumId;
+if(!_museumId){
+this.log("checkForAppMuseumUpdate: no appMuseumId configured, skipping");
+return;
+}
+this._appMuseumCurrentVersion=_appInfo.version;
+var _url="https://appcatalog.webosarchive.org/WebService/getLatestVersionInfo.php?app="+encodeURIComponent(_museumId)+"/"+encodeURIComponent(_appInfo.version);
+this.log("checkForAppMuseumUpdate: "+_url);
+this.$.appMuseumVersionService.setUrl(_url);
+this.$.appMuseumVersionService.call();
+},_appMuseumVersionSuccess:function(_sender,_json){
+this.log("_appMuseumVersionSuccess called");
+if(!_json||!_json.version||_json.error){
+return;
+}
+if(!this.isVersionNewer(_json.version,this._appMuseumCurrentVersion)){
+this.log("_appMuseumVersionSuccess: no newer version available");
+return;
+}
+this._appMuseumUpdateInfo={version:_json.version,versionNote:_json.versionNote,downloadUri:_json.downloadURI};
+// Second request for the fuller release notes, same two-step pattern
+// update.MD describes - falls back to the (possibly truncated) note
+// already captured above if this second call fails.
+var _detailsUrl="https://appcatalog.webosarchive.org/WebService/getMuseumDetails.php?id="+encodeURIComponent(enyo.fetchAppInfo().appMuseumId);
+this.$.appMuseumDetailsService.setUrl(_detailsUrl);
+this.$.appMuseumDetailsService.call();
+},_appMuseumVersionFailure:function(_sender,_response){
+this.log("_appMuseumVersionFailure called");
+},_appMuseumDetailsSuccess:function(_sender,_json){
+this.log("_appMuseumDetailsSuccess called");
+if(_json&&_json.versionNote){
+this._appMuseumUpdateInfo.versionNote=_json.versionNote;
+}
+this._announceUpdateAvailable();
+},_appMuseumDetailsFailure:function(_sender,_response){
+this.log("_appMuseumDetailsFailure called, falling back to short note");
+this._announceUpdateAvailable();
+},_announceUpdateAvailable:function(){
+if(this._updateDismissed||!this._appMuseumUpdateInfo){
+return;
+}
+this.raiseAppEvent("AppMuseumUpdateAvailable",this._appMuseumUpdateInfo);
+},dismissUpdate:function(){
+// Session-only, matching update.MD's g_update_dismissed - resets on next
+// launch rather than being persisted to preferences.
+this._updateDismissed=true;
+},isVersionNewer:function(_remote,_local){
+var _r=(_remote||"").split(".");
+var _l=(_local||"").split(".");
+for(var i=0;i<3;i++){
+var _rn=parseInt(_r[i]||"0",10);
+var _ln=parseInt(_l[i]||"0",10);
+if(isNaN(_rn)){
+_rn=0;
+}
+if(isNaN(_ln)){
+_ln=0;
+}
+if(_rn>_ln){
+return true;
+}
+if(_rn<_ln){
+return false;
+}
+}
+return false;
 },_appEventCallbacks:[],registerAppEvent:function(_10,_11){
 for(var i=0;i<this._appEventCallbacks.length;i++){
 var _12=this._appEventCallbacks[i];

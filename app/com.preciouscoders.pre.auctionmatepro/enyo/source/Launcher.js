@@ -1,4 +1,4 @@
-enyo.kind({name:"amhd.Launcher",kind:"enyo.Object",_newCardNumber:0,_windows:[],constructor:function(){
+enyo.kind({name:"amhd.Launcher",kind:"enyo.Object",_newCardNumber:0,_windows:[],_tokenRefreshTimer:null,constructor:function(){
 this.inherited(arguments);
 },startup:function(_1){
 this.log("Startup called");
@@ -15,6 +15,8 @@ enyo.application.services=new amhd.Services();
 enyo.application.dashboard=new amhd.Dashboard();
 enyo.application.notificationManager=new amhd.NotificationManager();
 enyo.application.appdata.loadUpdateInformation();
+enyo.application.appdata.checkForAppMuseumUpdate();
+_2.startPeriodicTokenRefresh();
 if(!enyo.application.runInBrowser){
 _2.relaunch(_4);
 }else{
@@ -138,7 +140,15 @@ _proceed();
 return;
 }
 var _now=(new Date()).getTime();
-if(_now<=_user.tokenExpiry-60000){
+// Margin needs to be comfortably wider than startPeriodicTokenRefresh's
+// 15 minute poll interval below, not just wide enough for the old
+// cold-launch-only race (a 60 second margin is fine for a single
+// check-then-use at launch, but on a 15 minute polling cadence a 60
+// second window can fall between ticks and let the token expire
+// before any tick ever lands inside it). Refreshing this early costs
+// nothing - eBay doesn't penalize refreshing before it's strictly
+// necessary.
+if(_now<=_user.tokenExpiry-(20*60*1000)){
 _proceed();
 return;
 }
@@ -161,6 +171,26 @@ _proceed();
 this.log("token refresh: request failed (network/broker), NOT logging out: "+(_err&&_err.errorCodeNumerical));
 _proceed();
 }));
+},
+// _maybeRefreshToken above only ever ran once, at cold launch - a session
+// left open (or backgrounded without being killed) for longer than the
+// ~2 hour eBay access token lifetime would silently go stale until the
+// next relaunch, surfacing as a real token-expired error mid-session even
+// though the refresh token itself (eBay issues these valid ~18 months) was
+// still perfectly good. Re-running the same check on a timer for the life
+// of the app process means the access token gets renewed well before it
+// goes stale regardless of how long the app stays open - the user should
+// only ever see the login screen again if the refresh token itself
+// actually dies (18 months unused, or access revoked from their eBay
+// account), not from ordinary long-running use. 15 minutes comfortably
+// beats the 2 hour window without polling the broker unnecessarily often.
+startPeriodicTokenRefresh:function(){
+if(this._tokenRefreshTimer){
+clearInterval(this._tokenRefreshTimer);
+}
+this._tokenRefreshTimer=setInterval(enyo.bind(this,function(){
+this._maybeRefreshToken(function(){});
+}),15*60*1000);
 },userLoadedCallback:function(_1e,_1f){
 if(_1e){
 enyo.application.preferences.data.user.userId=_1f.userId;

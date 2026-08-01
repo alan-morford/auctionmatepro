@@ -75,6 +75,25 @@ var _e={"y":0,"mn":0,"d":0,"h":0,"m":0,"s":0};
 return _e;
 }
 };
+// Browse API only ever gives an end Date (itemEndDate), never a Trading-API-style
+// TimeLeft duration string - this derives the {y,mn,d,h,m,s} shape ArticleFacade/
+// Formatters.formatTimeLeft expect (same shape parseISO8601Duration produces) so
+// Browse-sourced search results/item detail get a real countdown instead of
+// always reading as zero/ended.
+Helpers.timeLeftFromEndDate=function(_endDate){
+var _ms=_endDate.getTime()-(new Date()).getTime();
+if(_ms<0){
+_ms=0;
+}
+var _totalSeconds=Math.floor(_ms/1000);
+var _s=_totalSeconds%60;
+var _totalMinutes=Math.floor(_totalSeconds/60);
+var _m=_totalMinutes%60;
+var _totalHours=Math.floor(_totalMinutes/60);
+var _h=_totalHours%24;
+var _d=Math.floor(_totalHours/24);
+return{"y":0,"mn":0,"d":_d,"h":_h,"m":_m,"s":_s};
+};
 Helpers.UUID={};
 Helpers.UUID.S4=function(){
 return (((1+Math.random())*65536)|0).toString(16).substring(1);

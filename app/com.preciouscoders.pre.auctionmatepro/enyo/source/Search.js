@@ -7,7 +7,7 @@ this.searchTermChanged();
 this.log("searching for "+this.searchTerm);
 if(enyo.application.appdata.connectionInformation.isInternetConnectionAvailable){
 enyo.application.ebaydata.invalidateSearchResult();
-enyo.application.ebaydata.findItemsAdvanced(this.searchTerm,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,0,50,this.$.articleList.sortOrder,enyo.bind(this,function(_1,_2){
+enyo.application.ebaydata.findItemsAdvanced(this.searchTerm,this.$.articleList.filters,0,50,this.$.articleList.sortOrder,enyo.bind(this,function(_1,_2){
 this.log("search completed, success: "+_1);
 this.log(_2);
 this.$.articleList.searchCompleted();

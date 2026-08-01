@@ -1,10 +1,22 @@
-enyo.kind({name:"amhd.SearchResultList",kind:"amhd.ArticleListBase",published:{searchTerm:null,sortOrder:null,},_isSearching:false,create:function(){
+enyo.kind({name:"amhd.SearchResultList",kind:"amhd.ArticleListBase",published:{searchTerm:null,sortOrder:null,filters:null,},_isSearching:false,create:function(){
 if(!this.sortOrder){
 this.sortOrder=EBayConstants.SortOrder.BEST_MATCH;
+}
+if(!this.filters){
+this.filters={};
 }
 this.inherited(arguments);
 this.$.listEmptyMessage.setContent($L("No articles were found for your search."));
 this.$.toolbar.createComponent({kind:"ToolButton",caption:$L("Sort By"),onclick:"openSortOrderMenu",owner:this});
+this.$.toolbar.createComponent({kind:"ToolButton",caption:$L("Filter"),onclick:"openFilterPopup",owner:this});
+this.createComponent({name:"filterPopup",kind:"Popup",showHideMode:"transition",openClassName:"popup-scaleFadeIn",scrim:true,modal:true,className:"popup-transitioner searchfilter-popup",lazy:false,components:[{name:"filterPopupContent",kind:"amhd.SearchFilterPopup",onApply:"filterApplied",onCancel:"closeFilterPopup",onOpenCheckboxPopup:"openCheckboxPopupFromFilter"}]});
+// Declared as a sibling of filterPopup, not nested inside SearchFilterPopup's
+// own content - a Popup nested inside another Popup's content tree threw
+// framework-level errors on open (confirmed on-device), so
+// SearchFilterPopup only fires onOpenCheckboxPopup and this view owns the
+// actual checkbox Popup, handing results back via a direct checkboxDone()
+// call (see openCheckboxPopupFromFilter/checkboxPopupDone below).
+this.createComponent({name:"checkboxPopup",kind:"Popup",showHideMode:"transition",openClassName:"popup-scaleFadeIn",scrim:true,modal:true,className:"popup-transitioner searchfilter-checkboxpopup",lazy:false,components:[{name:"checkboxPopupContent",kind:"amhd.SearchCheckboxPopup",onDone:"checkboxPopupDone"}]});
 var _1=[{caption:$L("Time: ending soonest"),sortOrder:EBayConstants.SortOrder.END_TIME_SOONEST},{caption:$L("Time: newly listed"),sortOrder:EBayConstants.SortOrder.START_TIME_NEWEST},{caption:$L("Price + shipping: lowest first"),sortOrder:EBayConstants.SortOrder.PRICE_PLUS_SHIPPING_LOWEST},{caption:$L("Price + shipping: highest first"),sortOrder:EBayConstants.SortOrder.PRICE_PLUS_SHIPPING_HIGHEST},{caption:$L("Price: highest first"),sortOrder:EBayConstants.SortOrder.CURRENT_PRICE_HIGHEST},{caption:$L("Distance: nearest first"),sortOrder:EBayConstants.SortOrder.DISTANCE_NEAREST},{caption:$L("Best match"),sortOrder:EBayConstants.SortOrder.BEST_MATCH},];
 for(var i in _1){
 var _2=_1[i];
@@ -17,6 +29,21 @@ this._appDataList=enyo.application.appdata.searchList;
 this._auctionList=enyo.application.ebaydata.data.searchResult;
 },openSortOrderMenu:function(_3){
 this.$.sortOrderMenu.openAtControl(_3,{left:15,top:-28});
+},openFilterPopup:function(){
+this.$.filterPopupContent.configure(this.filters,enyo.application.ebaydata.data.searchResult.aspectRefinements||[]);
+this.$.filterPopup.openAtCenter();
+},filterApplied:function(_sender,_event){
+this.filters=_event.filters;
+this.$.filterPopup.close();
+this.reload();
+},closeFilterPopup:function(){
+this.$.filterPopup.close();
+},openCheckboxPopupFromFilter:function(_sender,_event){
+this.$.checkboxPopupContent.configure(_event.title,_event.items,_event.selectedValues);
+this.$.checkboxPopup.openAtCenter();
+},checkboxPopupDone:function(_sender,_event){
+this.$.checkboxPopup.close();
+this.$.filterPopupContent.checkboxDone(_event.selectedValues);
 },sortOrderSelected:function(_4,_5){
 for(var i in _4.controls){
 var _6=_4.controls[i];
@@ -50,7 +77,7 @@ return true;
 if(this._auctionList.items[_9]&&this._auctionList.items[_9+this.PAGESIZE]){
 return true;
 }
-enyo.application.ebaydata.findItemsAdvanced(this.searchTerm,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,_9,this.PAGESIZE,this.sortOrder,enyo.bind(this,function(_a,_b){
+enyo.application.ebaydata.findItemsAdvanced(this.searchTerm,this.filters,_9,this.PAGESIZE,this.sortOrder,enyo.bind(this,function(_a,_b){
 if(_a){
 this.log("page no "+_8+"loaded, current list length: "+this._auctionList.items.length);
 this.$.articleList.refresh();
@@ -74,7 +101,7 @@ this.showListHideSpinner();
 },reload:function(){
 if(enyo.application.appdata.connectionInformation.isInternetConnectionAvailable){
 enyo.application.ebaydata.invalidateSearchResult();
-enyo.application.ebaydata.findItemsAdvanced(this.searchTerm,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,0,50,this.sortOrder,enyo.bind(this,function(_c,_d){
+enyo.application.ebaydata.findItemsAdvanced(this.searchTerm,this.filters,0,50,this.sortOrder,enyo.bind(this,function(_c,_d){
 this.searchCompleted();
 if(_c){
 this.$.articleList.refresh();

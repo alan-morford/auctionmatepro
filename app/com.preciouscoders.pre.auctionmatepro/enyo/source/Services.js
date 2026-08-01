@@ -15,6 +15,15 @@ this.log("soundSuccess");
 this.log("soundFailure");
 },playClick:function(){
 this.playSound("key");
+},
+// Hands an App Museum II download URL off to Preware, mirroring
+// com.emu7800.touchpad's updater_install() (see update.MD) - same
+// palm://com.palm.applicationManager/ "open" service browserService above
+// already uses, just a different target app id/params, so no new
+// PalmService component needed.
+installViaPreware:function(_downloadUri,_callback){
+this.log("installViaPreware: "+_downloadUri);
+this.$.browserService.call({id:"org.webosinternals.preware",params:{type:"install",file:_downloadUri}},{callback:_callback});
 },openCatalog:function(_10){
 this.log("opening catalog for ID: "+_10);
 this.$.catalogService.call({id:"com.palm.app.enyo-findapps",params:{scene:"page",target:"http://developer.palm.com/appredirect/?packageid="+_10}});
